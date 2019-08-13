@@ -9,12 +9,5 @@ npm-debug.log
 # test coverage folder
 /coverage/
 
-# browser builds
-/bundle/
-
-# builds
-/commonjs/
-/modules/
-
 # Sublime
 *.sublime-workspace

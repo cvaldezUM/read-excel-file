@@ -20,7 +20,7 @@ describe('convertToJson', () => {
 				'STRING',
 				'PHONE'
 			], [
-				new Date(Date.parse('03/24/2018') - new Date().getTimezoneOffset() * 60 * 1000 + 12 * 60 * 60 * 1000), // '43183', // '03/24/2018',
+				new Date(Date.parse('03/24/2018') - new Date().getTimezoneOffset() * 60 * 1000 + 11 * 60 * 60 * 1000), // '43183', // '03/24/2018',
 				'123',
 				true,
 				'abc',
@@ -61,7 +61,8 @@ describe('convertToJson', () => {
 			number: 123,
 			phone: '+11234567890',
 			boolean: true,
-			string: 'abc'
+			string: 'abc',
+			originalRow: 1
 		}])
 	})
 
@@ -110,7 +111,8 @@ describe('convertToJson', () => {
 		errors.should.deep.equal([])
 
 		rows.should.deep.equal([{
-			names: ['Barack Obama', 'String, with, colons', 'Donald Trump']
+			names: ['Barack Obama', 'String, with, colons', 'Donald Trump'],
+			originalRow: 1
 		}])
 	})
 
@@ -137,7 +139,8 @@ describe('convertToJson', () => {
 		errors[0].error.should.equal('invalid')
 
 		rows.should.deep.equal([{
-			value: 1
+			value: 1,
+			originalRow: 1
 		}])
 	})
 
@@ -164,7 +167,8 @@ describe('convertToJson', () => {
 		errors[0].error.should.equal('invalid')
 
 		rows.should.deep.equal([{
-			value: 'https://kremlin.ru'
+			value: 'https://kremlin.ru',
+			originalRow: 1
 		}])
 	})
 
@@ -191,7 +195,8 @@ describe('convertToJson', () => {
 		errors[0].error.should.equal('invalid')
 
 		rows.should.deep.equal([{
-			value: 'vladimir.putin@kremlin.ru'
+			value: 'vladimir.putin@kremlin.ru',
+			originalRow: 1
 		}])
 	})
 
@@ -291,7 +296,8 @@ describe('convertToJson', () => {
 
 		rows.should.deep.equal([{
 			true: true,
-			false: false
+			false: false,
+			originalRow: 1
 		}])
 	})
 
@@ -337,9 +343,11 @@ describe('convertToJson', () => {
 		}])
 
 		rows.should.deep.equal([{
-			date
+			date,
+			originalRow: 1
 		}, {
-			date
+			date,
+			originalRow: 2
 		}])
 	})
 

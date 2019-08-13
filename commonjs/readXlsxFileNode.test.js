@@ -1,14 +1,22 @@
-import path from 'path'
+'use strict';
 
-import readXlsxFileNode from './readXlsxFileNode'
+var _path = require('path');
 
-describe('readXlsxFileNode', () => {
-	it('should read *.xlsx file on Node.js and parse JSON', () => {
-		const schema = {
+var _path2 = _interopRequireDefault(_path);
+
+var _readXlsxFileNode = require('./readXlsxFileNode');
+
+var _readXlsxFileNode2 = _interopRequireDefault(_readXlsxFileNode);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+describe('readXlsxFileNode', function () {
+	it('should read *.xlsx file on Node.js and parse JSON', function () {
+		var schema = {
 			'START DATE': {
 				prop: 'date',
 				type: Date,
-				template: 'MM/DD/YYYY',
+				template: 'MM/DD/YYYY'
 			},
 			'NUMBER OF STUDENTS': {
 				prop: 'numberOfStudents',
@@ -38,17 +46,20 @@ describe('readXlsxFileNode', () => {
 			'CONTACT': {
 				prop: 'contact',
 				required: true,
-				parse(value) {
-					return '+11234567890'
+				parse: function parse(value) {
+					return '+11234567890';
 				}
 			}
-		}
+		};
 
-		const rowMap = []
+		var rowMap = [];
 
-		return readXlsxFileNode(path.resolve(__dirname, '../test/spreadsheets/course.xlsx'), { schema, rowMap }).then(({ rows, errors }) => {
-			errors.should.deep.equal([])
-			rows[0].date = rows[0].date.getTime()
+		return (0, _readXlsxFileNode2.default)(_path2.default.resolve(__dirname, '../test/spreadsheets/course.xlsx'), { schema: schema, rowMap: rowMap }).then(function (_ref) {
+			var rows = _ref.rows,
+			    errors = _ref.errors;
+
+			errors.should.deep.equal([]);
+			rows[0].date = rows[0].date.getTime();
 			rows.should.deep.equal([{
 				date: convertToUTCTimezone(new Date(2018, 2, 24, 12)).getTime(),
 				numberOfStudents: 123,
@@ -59,11 +70,11 @@ describe('readXlsxFileNode', () => {
 				},
 				contact: '+11234567890',
 				originalRow: 1
-			}])
-			rowMap.should.deep.equal([0, 1])
-		})
-	})
-})
+			}]);
+			rowMap.should.deep.equal([0, 1]);
+		});
+	});
+});
 
 // Converts timezone to UTC while preserving the same time
 function convertToUTCTimezone(date) {
@@ -73,5 +84,6 @@ function convertToUTCTimezone(date) {
 	//
 	// https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Date/getTimezoneOffset
 	//
-	return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000)
+	return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
 }
+//# sourceMappingURL=readXlsxFileNode.test.js.map
