@@ -58,7 +58,7 @@ describe('readXlsxFileNode', () => {
 					title: 'Chemistry'
 				},
 				contact: '+11234567890',
-				originalRow: 1
+				originalRow: 2
 			}])
 			rowMap.should.deep.equal([0, 1])
 		})

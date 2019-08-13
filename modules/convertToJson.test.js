@@ -51,7 +51,7 @@ describe('convertToJson', function () {
 			phone: '+11234567890',
 			boolean: true,
 			string: 'abc',
-			originalRow: 1
+			originalRow: 2
 		}]);
 	});
 
@@ -91,7 +91,7 @@ describe('convertToJson', function () {
 
 		rows.should.deep.equal([{
 			names: ['Barack Obama', 'String, with, colons', 'Donald Trump'],
-			originalRow: 1
+			originalRow: 2
 		}]);
 	});
 
@@ -112,7 +112,7 @@ describe('convertToJson', function () {
 
 		rows.should.deep.equal([{
 			value: 1,
-			originalRow: 1
+			originalRow: 2
 		}]);
 	});
 
@@ -133,7 +133,7 @@ describe('convertToJson', function () {
 
 		rows.should.deep.equal([{
 			value: 'https://kremlin.ru',
-			originalRow: 1
+			originalRow: 2
 		}]);
 	});
 
@@ -154,7 +154,7 @@ describe('convertToJson', function () {
 
 		rows.should.deep.equal([{
 			value: 'vladimir.putin@kremlin.ru',
-			originalRow: 1
+			originalRow: 2
 		}]);
 	});
 
@@ -239,7 +239,7 @@ describe('convertToJson', function () {
 		rows.should.deep.equal([{
 			true: true,
 			false: false,
-			originalRow: 1
+			originalRow: 2
 		}]);
 	});
 
@@ -279,10 +279,10 @@ describe('convertToJson', function () {
 
 		rows.should.deep.equal([{
 			date: date,
-			originalRow: 1
+			originalRow: 2
 		}, {
 			date: date,
-			originalRow: 2
+			originalRow: 3
 		}]);
 	});
 

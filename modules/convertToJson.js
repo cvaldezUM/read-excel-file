@@ -46,7 +46,7 @@ var DEFAULT_OPTIONS = {
   for (var i = 1; i < data.length; i++) {
     var result = read(schema, data[i], i - 1, columns, errors, options);
     if (result) {
-      result.originalRow = i;
+      result.originalRow = i + 1;
       results.push(result);
     }
   }
