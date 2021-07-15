@@ -37,7 +37,7 @@
   "dependencies": {
     "jszip": "^3.1.5",
     "unzipper": "^0.9.15",
-    "xmldom": "^0.1.27",
+    "xmldom": "^0.5.0",
     "xpath": "0.0.27"
   },
   "devDependencies": {
