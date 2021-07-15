@@ -1,3 +1,53 @@
+<!--
+6.0.0 / xx.xx.xxxx
+==================
+
+  * Added [TypeScript](https://github.com/catamphetamine/read-excel-file/issues/71) definitions.
+-->
+
+5.2.0 / 17.06.2021
+==================
+
+* (internal) Removed `xpath` dependency to reduce bundle size.
+
+* (internal) Removed `xmldom` dependency in the browser to reduce bundle size.
+
+* (internal) Fixed date parser: in previous versions it was setting time to `12:00` instead of `00:00`.
+
+* (internal) `readXlsxFile()`: Added support for `e`, `d`, `z` and `inlineStr` cell types.
+
+5.1.0 / 06.04.2021
+==================
+
+  * Simply updated all dependencies to their latest version.
+
+5.0.0 / 27.12.2020
+==================
+
+  * `readXlsxFile()` now [doesn't skip](https://gitlab.com/catamphetamine/read-excel-file/-/issues/10) empty rows or columns: it only skips empty rows or columns at the end, but not in the beginning and not in the middle as it used to.
+
+  * Removed `"URL"`, `"Email"`, `"Integer"` types. Use non-string exported ones instead: `URL`, `Email`, `Integer`.
+
+  * Removed undocumented `convertToJson()` export.
+
+  * Removed undocumented `read-excel-file/json` export.
+
+4.1.0 / 09.11.2020
+==================
+
+* Renamed schema entry `parse()` function: now it's called `type`. This way, `type` could be both a built-in type and a custom type.
+
+* Changed the built-in `"Integer"`, `"URL"` and `"Email"` types: now they're exported functions again instead of strings. Strings still work.
+
+* Added `map` parameter: similar to `schema` but doesn't perform any parsing or validation. Can be used to map an Excel file to an array of objects that could be parsed/validated using [`yup`](https://github.com/jquense/yup).
+
+* `type` of a schema entry is no longer required: if no `type` is specified, then the cell value is returned "as is" (string, or number, or boolean, or `Date`).
+
+4.0.8 / 08.11.2020
+==================
+
+* Updated `JSZip` to the latest version. The [issue](https://gitlab.com/catamphetamine/read-excel-file/-/issues/8). The [original issue](https://github.com/catamphetamine/read-excel-file/issues/54).
+
 4.0.0 / 25.05.2019
 ==================
 
@@ -31,7 +81,7 @@
 
   * (breaking change) If using `readXlsx()` without `schema` parameter it now parses boolean cell values as `true`/`false` and numerical cell values are now parsed as numbers, and also date cell values are parsed as dates in some cases (numbers otherwise). If using `readXlsx()` with `schema` parameter then there are no breaking changes.
 
-  * Added `dateFormat` parameter (e.g. `MM/DD/YY`) for parsing dates automatically when using `readXlsx()` without `schema` parameter.
+  * Added `dateFormat` parameter (e.g. `mm/dd/yyyy`) for parsing dates automatically when using `readXlsx()` without `schema` parameter.
 
   * Added `read-excel-file/json` export for `convertToJson()`.
 

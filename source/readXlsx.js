@@ -108,11 +108,29 @@ export default function readXlsx(contents, xml, options = {}) {
     data[row][column] = cell.value
   }
 
-  if (options.transformData) {
-    data = options.transformData(data)
+  // Fill in the row map.
+  const { rowMap } = options
+  if (rowMap) {
+    let i = 0
+    while (i < data.length) {
+      rowMap[i] = i
+      i++
+    }
   }
 
-  data = dropEmptyRows(dropEmptyColumns(data), options.rowMap)
+  data = dropEmptyRows(
+    dropEmptyColumns(data, { onlyTrimAtTheEnd: true }),
+    { onlyTrimAtTheEnd: true, rowMap }
+  )
+
+  if (options.transformData) {
+    data = options.transformData(data)
+    // data = options.transformData(data, {
+    //   dropEmptyRowsAndColumns(data) {
+    //     return dropEmptyRows(dropEmptyColumns(data), { rowMap })
+    //   }
+    // })
+  }
 
   if (options.properties) {
     return {
@@ -167,11 +185,25 @@ function Cell(cellNode, sheet, xml, values, styles, properties, options) {
 
   let value = xml.select(sheet, cellNode, 'a:v', namespaces)[0]
   // For `xpath` `value` can be `undefined` while for native `DOMParser` it's `null`.
+  // So using `value && ...` instead of `if (value !== undefined) { ... }` here.
   value = value && value.textContent
 
   // http://webapp.docx4java.org/OnlineDemo/ecma376/SpreadsheetML/ST_CellType.html
   switch (cellNode.getAttribute('t')) {
+    // If the cell contains formula string.
+    case 'str':
+      value = value.trim()
+      if (value === '') {
+        value = undefined
+      }
+      break
+
+    // If the cell contains a "shared" string.
     case 's':
+      // If a cell has no value then there's no `<c/>` element for it.
+      // If a `<c/>` element exists then it's not empty.
+      // The `<v/>`alue is a key in the "shared strings" dictionary of the
+      // XLSX file, so look it up in the `values` dictionary by the numeric key.
       value = values[parseInt(value)].trim()
       if (value === '') {
         value = undefined
@@ -215,15 +247,11 @@ function Cell(cellNode, sheet, xml, values, styles, properties, options) {
   }
 }
 
-export function dropEmptyRows(data, rowMap, accessor = _ => _) {
-  // Fill in row map.
-  if (rowMap) {
-    let j = 0
-    while (j < data.length) {
-      rowMap[j] = j
-      j++
-    }
-  }
+export function dropEmptyRows(data, {
+  rowMap,
+  accessor = _ => _,
+  onlyTrimAtTheEnd
+} = {}) {
   // Drop empty rows.
   let i = data.length - 1
   while (i >= 0) {
@@ -241,13 +269,18 @@ export function dropEmptyRows(data, rowMap, accessor = _ => _) {
       if (rowMap) {
         rowMap.splice(i, 1)
       }
+    } else if (onlyTrimAtTheEnd) {
+      break
     }
     i--
   }
   return data
 }
 
-export function dropEmptyColumns(data, accessor = _ => _) {
+export function dropEmptyColumns(data, {
+  accessor = _ => _,
+  onlyTrimAtTheEnd
+} = {}) {
   let i = data[0].length - 1
   while (i >= 0) {
     let empty = true
@@ -263,6 +296,8 @@ export function dropEmptyColumns(data, accessor = _ => _) {
         data[j].splice(i, 1)
         j++
       }
+    } else if (onlyTrimAtTheEnd) {
+      break
     }
     i--
   }
@@ -357,11 +392,8 @@ function parseCellStyle(xf, numFmts) {
   return style
 }
 
+// I guess `xl/workbook.xml` file should always be present inside the *.xlsx archive.
 function parseProperties(content, xml) {
-  // I guess `xl/workbook.xml` file should always be present inside the *.xlsx archive.
-  if (!content) {
-    return {}
-  }
   const book = xml.createDocument(content)
   // http://webapp.docx4java.org/OnlineDemo/ecma376/SpreadsheetML/workbookPr.html
   const properties = {};
@@ -379,6 +411,7 @@ function parseProperties(content, xml) {
   //     sheetId="1"
   //     ns:id="rId3"/>
   // </sheets>
+  // http://www.datypic.com/sc/ooxml/e-ssml_sheet-1.html
   properties.sheets = []
   let i = 0
   for (const sheet of xml.select(book, null, '//a:sheets/a:sheet', namespaces)) {
@@ -436,9 +469,12 @@ function parseFileNames(content, xml) {
   if (!fileNames.styles) {
     throw new Error('"styles.xml" file not found in the *.xlsx file')
   }
-  if (!fileNames.sharedStrings) {
-    throw new Error('"sharedStrings.xml" file not found in the *.xlsx file')
-  }
+  // Seems like "sharedStrings.xml" is not required to exist.
+  // For example, when the spreadsheet doesn't contain any strings.
+  // https://github.com/catamphetamine/read-excel-file/issues/85
+  // if (!fileNames.sharedStrings) {
+  //   throw new Error('"sharedStrings.xml" file not found in the *.xlsx file')
+  // }
   return fileNames
 }
 

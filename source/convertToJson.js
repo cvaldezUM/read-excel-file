@@ -52,6 +52,9 @@ export default function(data, schema, options) {
   // Correct error rows.
   if (rowMap) {
     for (const error of errors) {
+      // Convert the `row` index in `data` to the
+      // actual `row` index in the spreadsheet.
+      // The `1` compensates for the header row.
       error.row = rowMap[error.row] + 1
     }
   }
@@ -141,17 +144,23 @@ export function parseValue(value, schemaEntry, options) {
   } else if (schemaEntry.type) {
     result = parseValueOfType(value, Array.isArray(schemaEntry.type) ? schemaEntry.type[0] : schemaEntry.type, options)
   } else {
-    throw new Error('Invalid schema entry: no .type and no .parse():\n\n' + JSON.stringify(schemaEntry, null, 2))
+    result = { value: value }
+    // throw new Error('Invalid schema entry: no .type and no .parse():\n\n' + JSON.stringify(schemaEntry, null, 2))
   }
   // If errored then return the error.
   if (result.error) {
     return result
   }
-  if (result.value !== null && schemaEntry.validate) {
-    try {
-      schemaEntry.validate(result.value)
-    } catch (error) {
-      return { error: error.message }
+  if (result.value !== null) {
+    if (schemaEntry.oneOf && schemaEntry.oneOf.indexOf(result.value) < 0) {
+      return { error: 'invalid' }
+    }
+    if (schemaEntry.validate) {
+      try {
+        schemaEntry.validate(result.value)
+      } catch (error) {
+        return { error: error.message }
+      }
     }
   }
   return result
@@ -165,11 +174,11 @@ export function parseValue(value, schemaEntry, options) {
  */
 function parseCustomValue(value, parse) {
   try {
-    let parsed = parse(value)
-    if (parsed === undefined) {
+    value = parse(value)
+    if (value === undefined) {
       return { value: null }
     }
-    return { value: parsed }
+    return { value }
   } catch (error) {
     return { error: error.message }
   }
@@ -187,7 +196,6 @@ function parseValueOfType(value, type, options) {
       return { value }
 
     case Number:
-    case 'Integer':
     case Integer:
       // The global isFinite() function determines
       // whether the passed value is a finite number.
@@ -206,14 +214,12 @@ function parseValueOfType(value, type, options) {
       }
       return { value }
 
-    case 'URL':
     case URL:
       if (!isURL(value)) {
         return { error: 'invalid' }
       }
       return { value }
 
-    case 'Email':
     case Email:
       if (!isEmail(value)) {
         return { error: 'invalid' }
@@ -247,6 +253,9 @@ function parseValueOfType(value, type, options) {
       return { error: 'invalid' }
 
     default:
+      if (typeof type === 'function') {
+        return parseCustomValue(value, type)
+      }
       throw new Error(`Unknown schema type: ${type && type.name || type}`)
   }
 }
